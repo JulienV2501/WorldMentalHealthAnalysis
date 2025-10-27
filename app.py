@@ -3,26 +3,28 @@ import plotly.express as px
 from dash import Dash, dcc, html, Input, Output
 import dash_bootstrap_components as dbc
 
-df = pd.read_csv('data/main.csv')
+from data_loader import load_data
+
+df = load_data(save_as_file = False)
 
 illness_cols = [
-    'Schizophrenia disorders (share of population) - Sex: Both - Age: Age-standardized',
-    'Depressive disorders (share of population) - Sex: Both - Age: Age-standardized',
-    'Anxiety disorders (share of population) - Sex: Both - Age: Age-standardized',
-    'Bipolar disorders (share of population) - Sex: Both - Age: Age-standardized',
-    'Eating disorders (share of population) - Sex: Both - Age: Age-standardized'
+    'schizo_disorders',
+    'depression_disorders',
+    'anxiety_disorders',
+    'bipolar_disorders',
+    'eating_disorders'
 ]
 
 illness_labels = {
-    illness_cols[0]: 'Schizophrenia',
+    illness_cols[0]: 'Schizophrenia disorders',
     illness_cols[1]: 'Depressive Disorders',
     illness_cols[2]: 'Anxiety Disorders',
     illness_cols[3]: 'Bipolar Disorders',
     illness_cols[4]: 'Eating Disorders'
 }
 
-min_year = int(df['Year'].min())
-max_year = int(df['Year'].max())
+min_year = int(df['year'].min())
+max_year = int(df['year'].max())
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -66,14 +68,14 @@ app.layout = dbc.Container([
      Input('year-slider', 'value')]
 )
 def update_map(selected_illness, selected_year):
-    filtered_df = df[df['Year'] == selected_year].copy()
+    filtered_df = df[df['year'] == selected_year].copy()
     
     fig = px.choropleth(
         filtered_df,
-        locations='Code',
+        locations='code',
         color=selected_illness,
-        hover_name='Entity',
-        hover_data={selected_illness: ':.3f', 'Code': False},
+        hover_name='country',
+        hover_data={selected_illness: ':.3f', 'code': False},
         color_continuous_scale='Viridis',
         labels={selected_illness: '% of Population'}
     )
