@@ -5,14 +5,17 @@ import dash_bootstrap_components as dbc
 
 from data_loader import load_data
 
+from indexMentalHealth import indexMentalHealth
 df = load_data(save_as_file = False)
+df = indexMentalHealth(df)
 
 illness_cols = [
     'schizo_disorders',
     'depression_disorders',
     'anxiety_disorders',
     'bipolar_disorders',
-    'eating_disorders'
+    'eating_disorders',
+    'global_mental_disorders'
 ]
 
 illness_labels = {
@@ -20,7 +23,9 @@ illness_labels = {
     illness_cols[1]: 'Depressive Disorders',
     illness_cols[2]: 'Anxiety Disorders',
     illness_cols[3]: 'Bipolar Disorders',
-    illness_cols[4]: 'Eating Disorders'
+    illness_cols[4]: 'Eating Disorders',
+    illness_cols[5]: 'Global Mental Disorders',
+
 }
 
 min_year = int(df['year'].min())
