@@ -81,9 +81,12 @@ app.layout = dbc.Container([
                         value=max_year,
                         marks={year: str(year) for year in range(min_year, max_year + 1, 5)},
                         step=1,
-                        tooltip={'placement': 'bottom', 'always_visible': True}
+                        tooltip={'placement': 'bottom', 'always_visible': True},
+                        className='mb-4'
                     ),
-                    dcc.Store(id='selected-country-code', data=default_code)
+                    dcc.Store(id='selected-country-code', data=default_code),
+
+                    dcc.Graph(id='global-evolution-graph', style={'height': '500px'}, config={'displayModeBar': False})
                 ])
             ])
         ], width=12, lg=10, xl=8)
@@ -357,6 +360,102 @@ def update_graphs(selected_country, compare_country, indicators):
         graphs.append(build_figure(ind))
 
     return graphs
+
+@app.callback(
+    Output('global-evolution-graph', 'figure'),
+    Input('illness-dropdown', 'value')
+)
+def update_global_evolution(selected_illness):
+    world_trend = (
+        df.groupby('year')[selected_illness]
+        .mean()
+        .reset_index()
+        .rename(columns={selected_illness: 'GlobalMean'})
+    )
+
+    
+    mean_by_country = (
+        df.groupby(['code', 'country'])[selected_illness]
+        .mean()
+        .sort_values(ascending=False)
+    )
+    top10 = mean_by_country.head(10).reset_index()
+    bottom10 = mean_by_country.tail(10).reset_index()
+
+    fig = go.Figure()
+
+    # --- Top 10 bars ---
+    fig.add_trace(go.Bar(
+        x=top10['code'],
+        y=top10[selected_illness],
+        name='Top 10 countries (avg)',
+        marker_color='rgba(30, 150, 255, 0.6)',
+        showlegend=True,
+        xaxis='x',
+        yaxis='y',
+        hovertext=top10['country'],
+        hovertemplate='%{hovertext}<br>Avg % of Population = %{y:.3f}<extra></extra>'
+    ))
+
+    # --- Bottom 10 bars ---
+    fig.add_trace(go.Bar(
+        x=bottom10['code'],
+        y=bottom10[selected_illness],
+        name='Bottom 10 countries (avg)',
+        marker_color='rgba(255, 160, 30, 0.6)',
+        showlegend=True,
+        xaxis='x',
+        yaxis='y',
+        hovertext=bottom10['country'],
+        hovertemplate='%{hovertext}<br>Avg % of Population = %{y:.3f}<extra></extra>'
+    ))
+
+    # --- Global curve ---
+    fig.add_trace(go.Scatter(
+        x=world_trend['year'],
+        y=world_trend['GlobalMean'],
+        mode='lines+markers',
+        name='Global Average (yearly)',
+        line=dict(color='black', width=3),
+        xaxis='x2',
+        yaxis='y',
+        hovertemplate='Year %{x}<br>Avg % of Population = %{y:.3f}<extra></extra>'
+    ))
+
+    fig.update_layout(
+        title=f"{illness_labels[selected_illness]} — Overall trend and representation of the most/least affected countries",
+
+        yaxis=dict(
+            title='% of Population',
+            rangemode='tozero'
+        ),
+
+        xaxis=dict(
+            domain=[0, 1],
+            anchor='y',
+            title='Countries (averages)',
+            tickangle=30
+        ),
+
+        xaxis2=dict(
+            domain=[0, 1],
+            anchor='y',
+            overlaying='x',
+            side='top',
+            title='Years (global evolution)',
+            tickmode='linear',
+            dtick=2,
+            showgrid=False,
+        ),
+
+        barmode='group', 
+        bargap=0.1,
+        legend=dict(orientation='h', y=-0.25),
+        margin=dict(l=50, r=30, t=130, b=60),
+        plot_bgcolor='rgba(255,255,255,1)'
+    )
+
+    return fig
 
 if __name__ == '__main__':
     app.run(debug=True)
