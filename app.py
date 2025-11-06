@@ -125,7 +125,7 @@ app.layout = dbc.Container([
                             )
                         ], md=6)
                     ], className='mb-3'),
-                    html.Label("Factor(s):", className='fw-semibold'),
+                    html.Label('Factor(s):', className='fw-semibold'),
                     dcc.Dropdown(
                         id='indicators-multi',
                         options=[{'label': illness_labels[col], 'value': col} for col in illness_cols],
@@ -423,7 +423,7 @@ def update_global_evolution(selected_illness):
     ))
 
     fig.update_layout(
-        title=f"{illness_labels[selected_illness]} — Overall trend and representation of the most/least affected countries",
+        title=f'{illness_labels[selected_illness]} - Overall trend and representation of the most/least affected countries',
 
         yaxis=dict(
             title='% of Population',
@@ -442,10 +442,10 @@ def update_global_evolution(selected_illness):
             anchor='y',
             overlaying='x',
             side='top',
-            title='Years (global evolution)',
-            tickmode='linear',
-            dtick=2,
+            title='',
+            showticklabels=False,
             showgrid=False,
+            showline=False, 
         ),
 
         barmode='group', 
@@ -453,6 +453,16 @@ def update_global_evolution(selected_illness):
         legend=dict(orientation='h', y=-0.25),
         margin=dict(l=50, r=30, t=130, b=60),
         plot_bgcolor='rgba(255,255,255,1)'
+    )
+
+    fig.add_annotation(
+        x=0.5, 
+        y=1.1,
+        xref="paper", 
+        yref="paper",
+        text="The line shows the global average across time; bars show average prevalence (over all available years) by country.",
+        showarrow=False,
+        font=dict(size=13)
     )
 
     return fig
