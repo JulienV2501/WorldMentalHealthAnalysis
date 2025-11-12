@@ -17,6 +17,12 @@ def load_data(save_as_file: bool):
         'Schizophrenia disorders (share of population) - Sex: Both - Age: Age-standardized': 'schizo_disorders'
     })
 
+    # rename continent name
+    df_mental.loc[df_mental["country"] == "Europe (IHME GBD)", "country"] = "Europe"
+    df_mental.loc[df_mental["country"] == "Africa (IHME GBD)", "country"] = "Africa"
+    df_mental.loc[df_mental["country"] == "America (IHME GBD)", "country"] = "America"
+    df_mental.loc[df_mental["country"] == "Asia (IHME GBD)", "country"] = "Asia"
+
     # unpivot unemp dataset from wide to long format
     df_unemp = df_unemp.melt(
         id_vars=['Country Name', 'Country Code'],

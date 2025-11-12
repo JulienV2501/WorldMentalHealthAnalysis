@@ -72,7 +72,6 @@ app.layout = dbc.Container([
                         value=illness_cols[0],
                         clearable=False
                     ),
-                    dcc.Graph(id='map-graph', style={'height': '60vh'}, config={'displayModeBar': False}),
                     html.Label('Year:', className='fw-bold mb-2'),
                     dcc.Slider(
                         id='year-slider',
@@ -84,7 +83,26 @@ app.layout = dbc.Container([
                         tooltip={'placement': 'bottom', 'always_visible': True},
                         className='mb-4'
                     ),
+
+                    dcc.Graph(id='map-graph', style={'height': '60vh'}, config={'displayModeBar': False}),
                     dcc.Store(id='selected-country-code', data=default_code),
+
+                    dbc.Row([
+                        dbc.Col([
+                            dcc.Graph(
+                                id='continent-bar',
+                                style={'height': '400px'},
+                                config={'displayModeBar': False}
+                            )
+                        ], width=6),
+                        dbc.Col([
+                            dcc.Graph(
+                                id='income-bar',
+                                style={'height': '400px'},
+                                config={'displayModeBar': False}
+                            )
+                        ], width=6)
+                    ], justify='center', className='mb-4'),
 
                     dcc.Graph(id='global-evolution-graph', style={'height': '500px'}, config={'displayModeBar': False})
                 ])
@@ -175,19 +193,22 @@ app.layout = dbc.Container([
                 ])
             ])
         ], width=12, lg=10, xl=8)
-    ], justify='center', className='mb-4'),
+    ], justify='center', className='mb-4')
 
 ], fluid=True, style={'padding': '20px'})
 
 @app.callback(
-    Output('map-graph', 'figure'),
+    [Output('map-graph', 'figure'),
+     Output('continent-bar', 'figure'),
+     Output('income-bar', 'figure')],
     [Input('illness-dropdown', 'value'),
      Input('year-slider', 'value')]
 )
-def update_map(selected_indicator, selected_year):
+def update_map_and_bar_plot(selected_indicator, selected_year):
     filtered_df = df[df['year'] == selected_year].copy()
     
-    fig = px.choropleth(
+    # --- Map ---
+    fig_map = px.choropleth(
         filtered_df,
         locations='code',
         color=selected_indicator,
@@ -197,12 +218,60 @@ def update_map(selected_indicator, selected_year):
         labels={selected_indicator: '% of Population'}
     )
     
-    fig.update_layout(
+    fig_map.update_layout(
         title=f'{illness_labels[selected_indicator]} - {selected_year}',
         geo=dict(showframe=False, showcoastlines=True, projection_type='natural earth')
     )
+
+    # --- Bar plot (continent) ---
+    df_cont = filtered_df[filtered_df['country'].isin(['Africa', 'Asia', 'Europe', 'America'])]
+    df_cont = df_cont.sort_values(by=selected_indicator, ascending=False)
+
+    fig_cont  = px.bar(
+        df_cont,
+        x='country', 
+        y=selected_indicator,
+        color='country',
+        text_auto='.2f',
+        color_discrete_sequence=px.colors.qualitative.Set2,
+        title='Average by continent',
+        labels={selected_indicator: '% of Population', 'country': ''}
+    )
+
+    fig_cont .update_layout(
+        showlegend=False,
+        plot_bgcolor='rgba(0,0,0,0)',
+        xaxis_title=None,
+        yaxis_title='% of Population',
+        margin=dict(l=50, r=20, t=50, b=60)
+    )
+
+    # --- Bar plot (income) ---
+    income_labels = ['Low-income countries', 'Lower-middle-income countries',
+                     'Upper-middle-income countries', 'High-income countries']
+    df_income = filtered_df[filtered_df['country'].isin(income_labels)]
+    df_income = df_income.sort_values(by=selected_indicator, ascending=False)
+
+    df_income['country'] = df_income['country'].str.replace(' countries', '').str.replace('-income', '').str.title()
+
+    fig_income = px.bar(
+        df_income,
+        x='country',
+        y=selected_indicator,
+        color='country',
+        text_auto='.2f',
+        color_discrete_sequence=px.colors.qualitative.Pastel1,
+        title='Average by countries income group',
+        labels={'country': '', selected_indicator: '% of Population'}
+    )
+    fig_income.update_layout(
+        showlegend=False,
+        plot_bgcolor='rgba(0,0,0,0)',
+        yaxis_title='% of Population',
+        margin=dict(l=50, r=20, t=50, b=60)
+    )
     
-    return fig
+    return fig_map, fig_cont, fig_income
 
 @app.callback(
     Output('selected-country-code', 'data'),
@@ -372,7 +441,6 @@ def update_global_evolution(selected_illness):
         .reset_index()
         .rename(columns={selected_illness: 'GlobalMean'})
     )
-
     
     mean_by_country = (
         df.groupby(['code', 'country'])[selected_illness]
@@ -458,9 +526,9 @@ def update_global_evolution(selected_illness):
     fig.add_annotation(
         x=0.5, 
         y=1.1,
-        xref="paper", 
-        yref="paper",
-        text="The line shows the global average across time; bars show average prevalence (over all available years) by country.",
+        xref='paper', 
+        yref='paper',
+        text='The line shows the global average across time; bars show average prevalence (over all available years) by country.',
         showarrow=False,
         font=dict(size=13)
     )
