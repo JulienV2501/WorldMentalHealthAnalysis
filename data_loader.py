@@ -4,6 +4,7 @@ def load_data(save_as_file: bool):
     df_mental = pd.read_csv('data/mental-illness.csv')
     df_unemp = pd.read_csv('data/unemployment.csv', skiprows=4)
     df_hfi = pd.read_csv('data/human-freedom-index.csv')
+    df_alcool = pd.read_csv('data/alcohol-consumption.csv')
 
     # rename base datasets columns
     df_mental = df_mental.rename(columns={
@@ -33,7 +34,7 @@ def load_data(save_as_file: bool):
     df_unemp = df_unemp.dropna(subset=['year', 'unemployment_rate'])
     df_unemp['year'] = df_unemp['year'].astype(int)
     df_unemp = df_unemp[['Country Name', 'year', 'unemployment_rate']]
-
+    
     df_unemp['unemployment_rate'] = pd.to_numeric(df_unemp['unemployment_rate'], errors='coerce')
 
     # rename hfi columns
@@ -48,6 +49,15 @@ def load_data(save_as_file: bool):
         right_on=['Country Name', 'year'],
         how='left'
     )
+
+    df_alcool=df_alcool.rename(columns={
+        'Entity': 'country',
+        'Code': 'code',
+        'Year': 'year',
+        "Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age)": 'Alcohol consumption'})
+    
+    df_alcool = df_alcool[['year', 'country', 'Alcohol consumption']]
+    df_merged = df_merged.merge(df_alcool, on=['country', 'year'], how='left')
 
     df_merged = df_merged.merge(df_hfi, on=['country', 'year'], how='left')
 
