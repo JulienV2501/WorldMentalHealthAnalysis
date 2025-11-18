@@ -2,5 +2,16 @@ import pandas as pd
 
 def indexMentalHealth(df: pd.DataFrame):
 
-    df["global_mental_disorders"] = df["depression_disorders"] + df["anxiety_disorders"] + df["bipolar_disorders"] + df["eating_disorders"] +df["schizo_disorders"]
+    cols = [
+    "depression_disorders",
+    "anxiety_disorders",
+    "bipolar_disorders",
+    "eating_disorders",
+    "schizo_disorders"
+    ]
+
+    df_norm = (df[cols] - df[cols].min()) / (df[cols].max() - df[cols].min())
+
+    df["global_mental_disorders"] = df_norm.sum(axis=1)
+
     return df

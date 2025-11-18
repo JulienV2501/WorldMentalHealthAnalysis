@@ -1,5 +1,5 @@
 pandas
 plotly
 statsmodels
-dash
+dash==3.2.0
 dash-bootstrap-components
