@@ -206,6 +206,8 @@ app.layout = dbc.Container([
 )
 def update_map_and_bar_plot(selected_indicator, selected_year):
     filtered_df = df[df['year'] == selected_year].copy()
+
+    unit_of_measurement = '% of Population' if selected_indicator != 'global_mental_disorders' else 'global score [0,1]'
     
     # --- Map ---
     fig_map = px.choropleth(
@@ -215,7 +217,7 @@ def update_map_and_bar_plot(selected_indicator, selected_year):
         hover_name='country',
         hover_data={selected_indicator: ':.3f', 'code': False},
         color_continuous_scale='Viridis',
-        labels={selected_indicator: '% of Population'}
+        labels={selected_indicator: unit_of_measurement}
     )
     
     fig_map.update_layout(
@@ -235,14 +237,14 @@ def update_map_and_bar_plot(selected_indicator, selected_year):
         text_auto='.2f',
         color_discrete_sequence=px.colors.qualitative.Set2,
         title='Average by continent',
-        labels={selected_indicator: '% of Population', 'country': ''}
+        labels={selected_indicator: unit_of_measurement, 'country': ''}
     )
 
     fig_cont .update_layout(
         showlegend=False,
         plot_bgcolor='rgba(0,0,0,0)',
         xaxis_title=None,
-        yaxis_title='% of Population',
+        yaxis_title=unit_of_measurement,
         margin=dict(l=50, r=20, t=50, b=60)
     )
 
@@ -262,12 +264,12 @@ def update_map_and_bar_plot(selected_indicator, selected_year):
         text_auto='.2f',
         color_discrete_sequence=px.colors.qualitative.Pastel1,
         title='Average by countries income group',
-        labels={'country': '', selected_indicator: '% of Population'}
+        labels={'country': '', selected_indicator: unit_of_measurement}
     )
     fig_income.update_layout(
         showlegend=False,
         plot_bgcolor='rgba(0,0,0,0)',
-        yaxis_title='% of Population',
+        yaxis_title=unit_of_measurement,
         margin=dict(l=50, r=20, t=50, b=60)
     )
     
@@ -390,7 +392,7 @@ def update_graphs(selected_country, compare_country, indicators):
     if not selected_country or not indicators:
         return graphs
 
-    def build_figure(indicator: str):
+    def build_figure(indicator: str, unit_of_measurement:str):
         df_1 = df[df['code'] == selected_country].sort_values('year') if selected_country else pd.DataFrame()
         df_2 = df[df['code'] == compare_country].sort_values('year') if compare_country else pd.DataFrame()
 
@@ -413,12 +415,12 @@ def update_graphs(selected_country, compare_country, indicators):
         fig = px.line(
             plot_df,
             x='year', y=indicator, color='Country',
-            labels={'year': 'Year', indicator: '% of Population'},
+            labels={'year': 'Year', indicator: unit_of_measurement},
             title=illness_labels[indicator]
         )
         fig.update_traces(
             mode='lines+markers',
-            hovertemplate='Year=%{x}<br>% of Pop=%{y:.3f}<extra>%{fullData.name}</extra>'
+            hovertemplate='Year=%{x}<br>{unit_of_measurement}=%{y:.3f}<extra>%{fullData.name}</extra>'
         )
 
         fig.update_yaxes(autorange=False, range=[0, ymax * 1.05])
@@ -426,7 +428,8 @@ def update_graphs(selected_country, compare_country, indicators):
         return dcc.Graph(figure=fig, style={'height': '320px'}, config={'displayModeBar': False})
 
     for ind in indicators:
-        graphs.append(build_figure(ind))
+        unit_of_measurement = '% of Population' if ind != 'global_mental_disorders' else 'global score [0,1]'
+        graphs.append(build_figure(ind, unit_of_measurement))
 
     return graphs
 
@@ -435,6 +438,8 @@ def update_graphs(selected_country, compare_country, indicators):
     Input('illness-dropdown', 'value')
 )
 def update_global_evolution(selected_illness):
+    unit_of_measurement = '% of Population' if selected_illness != 'global_mental_disorders' else 'global score [0,1]'
+
     world_trend = (
         df.groupby('year')[selected_illness]
         .mean()
@@ -462,7 +467,7 @@ def update_global_evolution(selected_illness):
         xaxis='x',
         yaxis='y',
         hovertext=top10['country'],
-        hovertemplate='%{hovertext}<br>Avg % of Population = %{y:.3f}<extra></extra>'
+        hovertemplate=f'%{{hovertext}}<br>Avg {unit_of_measurement} = %{{y:.3f}}<extra></extra>'
     ))
 
     # --- Bottom 10 bars ---
@@ -475,7 +480,7 @@ def update_global_evolution(selected_illness):
         xaxis='x',
         yaxis='y',
         hovertext=bottom10['country'],
-        hovertemplate='%{hovertext}<br>Avg % of Population = %{y:.3f}<extra></extra>'
+        hovertemplate=f'%{{hovertext}}<br>Avg {unit_of_measurement} = %{{y:.3f}}<extra></extra>'
     ))
 
     # --- Global curve ---
@@ -487,14 +492,14 @@ def update_global_evolution(selected_illness):
         line=dict(color='black', width=3),
         xaxis='x2',
         yaxis='y',
-        hovertemplate='Year %{x}<br>Avg % of Population = %{y:.3f}<extra></extra>'
+        hovertemplate=f'Year %{{x}}<br>Avg {unit_of_measurement} = %{{y:.3f}}<extra></extra>'
     ))
 
     fig.update_layout(
         title=f'{illness_labels[selected_illness]} - Overall trend and representation of the most/least affected countries',
 
         yaxis=dict(
-            title='% of Population',
+            title=unit_of_measurement,
             rangemode='tozero'
         ),
 
