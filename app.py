@@ -154,7 +154,20 @@ app.layout = dbc.Container([
                         clearable=False
                     ),
                     html.Hr(),
-                    html.Div(id='graphs-container')
+                    html.Div(id='graphs-container'),
+
+                    html.Hr(),
+                    dcc.Slider(
+                        id='radar-year-slider',
+                        min=correlation_min_year,
+                        max=correlation_max_year,
+                        value=correlation_max_year,
+                        marks={year: str(year) for year in range(correlation_min_year, correlation_max_year + 1, 5)},
+                        step=1,
+                        tooltip={'placement': 'bottom', 'always_visible': True},
+                        className='mb-4'
+                    ),
+                    html.Div(id='radar-graphs-container')
                 ])
             ])
         ], width=12, lg=10, xl=8)
@@ -442,16 +455,16 @@ def update_correlation_graphs(selected_year):
     )
 
     pretty_names = {
-        "schizo_disorders": "Schizophrenia",
-        "depression_disorders": "Depression",
-        "anxiety_disorders": "Anxiety",
-        "bipolar_disorders": "Bipolar Disorder",
-        "eating_disorders": "Eating Disorders",
-        "unemployment_rate": "Unemployment Rate (%)",
-        "hf_score": "Human Freedom Index",
-        "alcohol_consumption": "Alcohol Consumption (liters)",
-        "gii": "Gender Inequality Index",
-        "global_mental_disorders": "Global Mental Disorders"
+        'schizo_disorders': 'Schizophrenia',
+        'depression_disorders': 'Depression',
+        'anxiety_disorders': 'Anxiety',
+        'bipolar_disorders': 'Bipolar Disorder',
+        'eating_disorders': 'Eating Disorders',
+        'unemployment_rate': 'Unemployment Rate (%)',
+        'hf_score': 'Human Freedom Index',
+        'alcohol_consumption': 'Alcohol Consumption (liters)',
+        'gii': 'Gender Inequality Index',
+        'global_mental_disorders': 'Global Mental Disorders'
     }
 
     corr_matrix = df_corr.copy()
@@ -533,6 +546,82 @@ def update_graphs(selected_country, compare_country, indicators):
         graphs.append(build_figure(ind, unit_of_measurement))
 
     return graphs
+
+@app.callback(
+    Output('radar-graphs-container', 'children'),
+    Input('selected-country-code', 'data'),
+    Input('compare-country-dropdown', 'value'),
+    Input('radar-year-slider', 'value')
+)
+def update_radar_graphs(selected_country, compare_country, selected_year):
+    if not selected_country:
+        return None
+    
+    df_year = df[df['year'] == selected_year].copy()
+
+    c1_row = df_year[df_year['code'] == selected_country]
+    c1 = c1_row.iloc[0]
+
+    pretty_names = {
+        'unemployment_rate': 'Unemployment (%)',
+        'gii': 'Gender Inequality Index',
+        'hf_score': 'Human Freedom Index',
+        'alcohol_consumption': 'Alcohol Consumption',
+        'global_mental_disorders': 'Mental Disorders (Global)'
+    }
+
+    indicators = list(pretty_names.keys())
+    categories = [pretty_names[i] for i in indicators]
+
+    norm_values = {}
+
+    for ind in indicators:
+        min_val = df_year[ind].min()
+        max_val = df_year[ind].max()
+
+        c1_val = (c1[ind] - min_val) / (max_val - min_val)
+
+        norm_values[ind] = {'c1': c1_val}
+
+        if compare_country:
+            c2_row = df_year[df_year['code'] == compare_country]
+            c2 = c2_row.iloc[0]
+
+            c2_val = (c2[ind] - min_val) / (max_val - min_val)
+
+            norm_values[ind]['c2'] = c2_val
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatterpolar(
+        r=[norm_values[i]['c1'] for i in pretty_names.keys()],
+        theta=categories,
+        fill='toself',
+        name=code_to_name(selected_country),
+        line=dict(width=2)
+    ))
+
+    if compare_country:
+        c2_row = df_year[df_year['code'] == compare_country].iloc[0]
+        fig.add_trace(go.Scatterpolar(
+            r=[norm_values[i]['c2'] for i in pretty_names.keys()],
+            theta=categories,
+            fill='toself',
+            name=code_to_name(compare_country),
+            line=dict(width=2)
+        ))
+
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(visible=True, range=[0, 1])
+        ),
+        title=f'Country Comparison Radar - {selected_year}',
+        showlegend=True
+    )
+
+    return html.Div([
+        dcc.Graph(figure=fig)
+    ])
 
 @app.callback(
     Output('global-evolution-graph', 'figure'),
