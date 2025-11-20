@@ -5,6 +5,7 @@ def load_data(save_as_file: bool):
     df_unemp = pd.read_csv('data/unemployment.csv', skiprows=4)
     df_hfi = pd.read_csv('data/human-freedom-index.csv')
     df_alcool = pd.read_csv('data/alcohol-consumption.csv')
+    df_gii = pd.read_csv('data/gender-inequality-index.csv')
 
     # rename base datasets columns
     df_mental = df_mental.rename(columns={
@@ -37,12 +38,6 @@ def load_data(save_as_file: bool):
     
     df_unemp['unemployment_rate'] = pd.to_numeric(df_unemp['unemployment_rate'], errors='coerce')
 
-    # rename hfi columns
-    df_hfi = df_hfi.rename(columns={
-        'countries': 'country',
-    })
-    df_hfi = df_hfi[['year', 'country', 'hf_score']]
-
     df_merged = df_mental.merge(
         df_unemp,
         left_on=['country', 'year'],
@@ -50,16 +45,30 @@ def load_data(save_as_file: bool):
         how='left'
     )
 
+    # rename hfi columns
+    df_hfi = df_hfi.rename(columns={
+        'countries': 'country',
+    })
+    df_hfi = df_hfi[['year', 'country', 'hf_score']]
+    df_merged = df_merged.merge(df_hfi, on=['country', 'year'], how='left')
+
     df_alcool=df_alcool.rename(columns={
         'Entity': 'country',
         'Code': 'code',
         'Year': 'year',
-        "Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age)": 'Alcohol consumption'})
-    
-    df_alcool = df_alcool[['year', 'country', 'Alcohol consumption']]
+        "Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age)": 'alcohol_consumption'}
+    )
+    df_alcool = df_alcool[['year', 'country', 'alcohol_consumption']]
     df_merged = df_merged.merge(df_alcool, on=['country', 'year'], how='left')
 
-    df_merged = df_merged.merge(df_hfi, on=['country', 'year'], how='left')
+    df_gii = df_gii.rename(columns={
+        'Entity': 'country',
+        'Code': 'code',
+        'Year': 'year',
+        "Gender Inequality Index": 'gii'}
+    )
+    df_gii = df_gii[['year', 'country', 'gii']]
+    df_merged = df_merged.merge(df_gii, on=['country', 'year'], how='left')
 
     if 'Country Name' in df_merged.columns:
         df_merged.drop(columns=['Country Name'], inplace=True)
