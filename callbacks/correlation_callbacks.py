@@ -167,7 +167,7 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
 
         fig_cm = px.imshow(
             corr_matrix,
-            text_auto=True,
+             text_auto=".2f",
             aspect='auto',
             color_continuous_scale='RdBu_r',
             zmin=-1, zmax=1
