@@ -89,7 +89,7 @@ def register_comparison_callbacks(app, df, illness_labels):
             )
             fig.update_traces(
                 mode='lines+markers',
-                hovertemplate='Year=%{x}<br>{unit_of_measurement}=%{y:.3f}<extra>%{fullData.name}</extra>'
+                hovertemplate=f'Year=%{{x}}<br>{unit_of_measurement}=%{{y:.3f}}<extra>%{{fullData.name}}</extra>'
             )
 
             fig.update_yaxes(autorange=False, range=[0, ymax * 1.05])
