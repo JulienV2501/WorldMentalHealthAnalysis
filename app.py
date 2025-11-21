@@ -58,7 +58,6 @@ app.layout = dbc.Container([
                     ),
 
                     dcc.Graph(id='map-graph', style={'height': '60vh'}, config={'displayModeBar': False}),
-                    dcc.Store(id='selected-country-code', data=default_code),
 
                     dbc.Row([
                         dbc.Col([
@@ -92,12 +91,26 @@ app.layout = dbc.Container([
                 dbc.CardBody([
                     dbc.Row([
                         dbc.Col([
-                            html.Div([
-                                html.H5(id='primary-country-name')
-                            ])
+                            html.Label('Select country to analyse evolution:', className='fw-semibold'),
+                            dcc.Dropdown(
+                                id='select-country-dropdown',
+                                options=[
+                                    {
+                                        'label': str(row['country']),
+                                        'value': str(row['code'])
+                                    }
+                                    for _, row in df[['code', 'country']]
+                                    .dropna(subset=['code', 'country'])
+                                    .drop_duplicates()
+                                    .sort_values(by='country')
+                                    .iterrows()
+                                ],
+                                value=None,
+                                placeholder='Select first country',
+                            )
                         ], md=6),
                         dbc.Col([
-                            html.Label('Compare with another country:', className='fw-semibold'),
+                            html.Label('(Optional) Compare with another country:', className='fw-semibold'),
                             dcc.Dropdown(
                                 id='compare-country-dropdown',
                                 options=[
@@ -112,7 +125,8 @@ app.layout = dbc.Container([
                                     .iterrows()
                                 ],
                                 value=None,
-                                placeholder='Select country',
+                                placeholder='Select second country',
+                                disabled=True
                             )
                         ], md=6)
                     ], className='mb-3'),

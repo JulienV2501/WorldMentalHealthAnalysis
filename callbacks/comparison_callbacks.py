@@ -7,26 +7,43 @@ from utils.helpers import code_to_name
 
 def register_comparison_callbacks(app, df, illness_labels):
     @app.callback(
-        Output('selected-country-code', 'data'),
-        Output('primary-country-name', 'children'),
-        Input('map-graph', 'clickData'),
-        State('selected-country-code', 'data')
+        Output("compare-country-dropdown", "options"),
+        Output("compare-country-dropdown", "disabled"),
+        Output("compare-country-dropdown", "value"),
+        Input("select-country-dropdown", "value"),
+        State("compare-country-dropdown", "value")
     )
-    def store_selected_country(clickData, current_code):
-        '''
-        Store selected country on map
-        '''
+    def update_second_dropdown(selected_country_1, selected_country_2):
+        # If first dropdown has no value: disable second one
+        if selected_country_1 is None:
+            return [], True, None
 
-        code = current_code
-        if clickData and 'points' in clickData and len(clickData['points']) > 0:
-            pt = clickData['points'][0]
-            code = pt.get('location', current_code)
-        name = code_to_name(df, code) if code else 'No country selected'
-        return code, name
-    
+        # Exclude first dropdown value
+        new_options=[
+            {
+                'label': str(row['country']),
+                'value': str(row['code'])
+            }
+            for _, row in (
+                df[['code', 'country']]
+                .dropna(subset=['code', 'country'])
+                .drop_duplicates()
+                .sort_values(by='country')
+                .iterrows()
+            )
+            if row['code'] != selected_country_1
+        ]
+
+        # Reset if necessary
+        if selected_country_2 == selected_country_1:
+            selected_country_2 = None
+
+        return new_options, False, selected_country_2
+
+
     @app.callback(
         Output('graphs-container', 'children'),
-        Input('selected-country-code', 'data'),
+        Input('select-country-dropdown', 'value'),
         Input('compare-country-dropdown', 'value'),
         Input('indicators-multi', 'value')
     )
@@ -88,7 +105,7 @@ def register_comparison_callbacks(app, df, illness_labels):
     
     @app.callback(
         Output('radar-graphs-container', 'children'),
-        Input('selected-country-code', 'data'),
+        Input('select-country-dropdown', 'value'),
         Input('compare-country-dropdown', 'value'),
         Input('radar-year-slider', 'value')
     )
