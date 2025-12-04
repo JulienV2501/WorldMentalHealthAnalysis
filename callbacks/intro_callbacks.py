@@ -25,9 +25,12 @@ def register_intro_callbacks(app, df, illness_labels):
             locations='code',
             color=selected_indicator,
             hover_name='country',
-            hover_data={selected_indicator: ':.3f', 'code': False},
             color_continuous_scale='Viridis',
             labels={selected_indicator: unit_of_measurement}
+        )
+        
+        fig_map.update_traces(
+            hovertemplate='<b>%{hovertext}</b><br>' + unit_of_measurement + ': %{z:.2f}%<extra></extra>'
         )
         
         fig_map.update_layout(
@@ -39,24 +42,25 @@ def register_intro_callbacks(app, df, illness_labels):
         df_cont = filtered_df[filtered_df['country'].isin(['Africa', 'Asia', 'Europe', 'America'])]
         df_cont = df_cont.sort_values(by=selected_indicator, ascending=False)
 
-        fig_cont  = px.bar(
+        fig_cont = px.bar(
             df_cont,
             x='country', 
             y=selected_indicator,
             color='country',
             text_auto='.2f',
-            color_discrete_sequence=px.colors.qualitative.Set2,
+            color_discrete_sequence=px.colors.qualitative.Pastel,
             title='Average by continent',
             labels={selected_indicator: unit_of_measurement, 'country': ''}
         )
 
-        fig_cont .update_layout(
+        fig_cont.update_layout(
             showlegend=False,
             plot_bgcolor='rgba(0,0,0,0)',
             xaxis_title=None,
             yaxis_title=unit_of_measurement,
             margin=dict(l=50, r=20, t=50, b=60)
         )
+        fig_cont.update_traces(hoverinfo='skip', hovertemplate=None)
 
         # --- Bar plot (income) ---
         income_labels = ['Low-income countries', 'Lower-middle-income countries',
@@ -72,16 +76,18 @@ def register_intro_callbacks(app, df, illness_labels):
             y=selected_indicator,
             color='country',
             text_auto='.2f',
-            color_discrete_sequence=px.colors.qualitative.Pastel1,
+            color_discrete_sequence=px.colors.qualitative.Set2,
             title='Average by countries income group',
             labels={'country': '', selected_indicator: unit_of_measurement}
         )
+        
         fig_income.update_layout(
             showlegend=False,
             plot_bgcolor='rgba(0,0,0,0)',
             yaxis_title=unit_of_measurement,
             margin=dict(l=50, r=20, t=50, b=60)
         )
+        fig_income.update_traces(hoverinfo='skip', hovertemplate=None)
         
         return fig_map, fig_cont, fig_income
     
