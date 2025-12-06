@@ -87,10 +87,16 @@ def register_comparison_callbacks(app, df, illness_labels):
                 labels={'year': 'Year', indicator: unit_of_measurement},
                 title=illness_labels[indicator]
             )
+
+            symbols = ["circle", "square"]
+
             fig.update_traces(
                 mode='lines+markers',
                 hovertemplate=f'Year=%{{x}}<br>{unit_of_measurement}=%{{y:.3f}}<extra>%{{fullData.name}}</extra>'
             )
+
+            for i, trace in enumerate(fig.data):
+                trace.marker.symbol = symbols[i % len(symbols)]
 
             fig.update_yaxes(autorange=False, range=[0, ymax * 1.05])
             fig.update_layout(margin=dict(l=10, r=10, t=40, b=10))
@@ -158,7 +164,10 @@ def register_comparison_callbacks(app, df, illness_labels):
             theta=categories,
             fill='toself',
             name=code_to_name(df, selected_country),
-            line=dict(width=2)
+            marker_symbol='circle',
+            marker_size=8,
+            marker_color='#0072B2',
+            line=dict(color='#0072B2')
         ))
 
         if compare_country:
@@ -168,7 +177,10 @@ def register_comparison_callbacks(app, df, illness_labels):
                 theta=categories,
                 fill='toself',
                 name=code_to_name(df, compare_country),
-                line=dict(width=2)
+                marker_symbol='square',
+                marker_size=8,
+                marker_color='#D55E00',
+                line=dict(color='#D55E00')
             ))
 
         fig.update_layout(

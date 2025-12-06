@@ -49,7 +49,6 @@ app.layout = dbc.Container([
             dbc.Card([
                 dbc.CardHeader(html.H4('Indicators')),
                 dbc.CardBody([
-                html.Div(id='radar-graphs-container'),
                 html.Div([
                     html.Ul([
                         html.Li([
@@ -298,11 +297,10 @@ app.layout = dbc.Container([
     html.Br(),
     
     # ---------------- Correlation Analysis ----------------
-        # ---------------- Correlation Analysis ----------------
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader(html.H4('Global Correlations: Mental Health, Unemployment & Freedom')),
+                dbc.CardHeader(html.H4('Global Correlations')),
                 dbc.CardBody([
 
                     html.P(

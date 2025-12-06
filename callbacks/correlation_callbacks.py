@@ -2,6 +2,7 @@ from dash import Output, Input
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
+import numpy as np
 
 def register_correlation_callbacks(app, df, correlation_min_year, correlation_max_year):
     @app.callback(
@@ -35,9 +36,9 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
             trendline='ols',
             labels={
                 'unemployment_rate': 'Unemployment Rate (%)',
-                'global_mental_disorders': 'Mental Disorders (% Pop.)'
+                'global_mental_disorders': 'Global Mental Disorders'
             },
-            title=f'Mental Disorders vs Unemployment ({selected_year})'
+            title=f'Global Mental Disorders vs Unemployment rate ({selected_year})'
         )
         fig1.update_layout(margin=dict(l=10, r=10, t=40, b=10))
         
@@ -50,9 +51,9 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
             trendline='ols',
             labels={
                 'hf_score': 'Human Freedom Index',
-                'global_mental_disorders': 'Mental Disorders (% Pop.)'
+                'global_mental_disorders': 'Global Mental Disorders'
             },
-            title=f'Mental Disorders vs Freedom ({selected_year})'
+            title=f'Global Mental Disorders vs Freedom ({selected_year})'
         )
         fig2.update_layout(margin=dict(l=10, r=10, t=40, b=10))
         
@@ -65,9 +66,9 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
             trendline='ols',
             labels={
                 'alcohol_consumption': 'Alcohol consumption (liters)',
-                'global_mental_disorders': 'Mental Disorders (% Pop.)'
+                'global_mental_disorders': 'Global Mental Disorders'
             },
-            title=f'Mental Disorders vs Alcohol consumption ({selected_year})'
+            title=f'Global Mental Disorders vs Alcohol consumption ({selected_year})'
         )
         fig3.update_layout(margin=dict(l=10, r=10, t=40, b=10))
 
@@ -80,9 +81,9 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
             trendline='ols',
             labels={
                 'gii': 'Gender Inequality Index [0,1]',
-                'global_mental_disorders': 'Mental Disorders (% Pop.)'
+                'global_mental_disorders': 'Global Mental Disorders'
             },
-            title=f'Mental Disorders vs Gender Inequality Index ({selected_year})'
+            title=f'Global Mental Disorders vs Gender Inequality Index ({selected_year})'
         )
         fig4.update_layout(margin=dict(l=10, r=10, t=40, b=10))
         
@@ -100,49 +101,83 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
                 corr_gii = df_year[['global_mental_disorders', 'gii']].corr().iloc[0, 1]
                 correlations.append({
                     'year': year,
-                    'Mental vs Unemployment': corr_unemp,
-                    'Mental vs Freedom': corr_freedom,
-                    'Mental vs Alc. consumption': corr_alcohol,
-                    'Mental vs Gender Inequality Index': corr_gii
+                    'Global Mental Dis. vs Unemployment rate': corr_unemp,
+                    'Global Mental Dis. vs Freedom Index': corr_freedom,
+                    'Global Mental Dis. vs Alcohol cons.': corr_alcohol,
+                    'Global Mental Dis. vs Gender Inequality Index': corr_gii
                 })
         
         df_corr_time = pd.DataFrame(correlations)
         
         fig5 = go.Figure()
+
         fig5.add_trace(go.Scatter(
             x=df_corr_time['year'],
-            y=df_corr_time['Mental vs Unemployment'],
+            y=df_corr_time['Global Mental Dis. vs Unemployment rate'],
             mode='lines+markers',
-            name='Mental vs Unemployment'
+            name='Global Mental Dis. vs Unemployment rate',
+            marker_symbol='circle',
+            marker_size=8,
+            marker_color='#0072B2',
+            line=dict(color='#0072B2')
         ))
         fig5.add_trace(go.Scatter(
             x=df_corr_time['year'],
-            y=df_corr_time['Mental vs Freedom'],
+            y=df_corr_time['Global Mental Dis. vs Freedom Index'],
             mode='lines+markers',
-            name='Mental vs Freedom'
+            name='Global Mental Dis. vs Freedom Index',
+            marker_symbol='square',
+            marker_size=8,
+            marker_color='#D55E00',
+            line=dict(color='#D55E00')
         ))
         fig5.add_trace(go.Scatter(
             x=df_corr_time['year'],
-            y=df_corr_time['Mental vs Alc. consumption'],
+            y=df_corr_time['Global Mental Dis. vs Alcohol cons.'],
             mode='lines+markers',
-            name='Mental vs Alc. consumption'
+            name='Global Mental Dis. vs Alcohol cons.',
+            marker_symbol='triangle-up',
+            marker_size=8,
+            marker_color='#009E73',
+            line=dict(color='#009E73')
         ))
         fig5.add_trace(go.Scatter(
             x=df_corr_time['year'],
-            y=df_corr_time['Mental vs Gender Inequality Index'],
+            y=df_corr_time['Global Mental Dis. vs Gender Inequality Index'],
             mode='lines+markers',
-            name='Mental vs Gender Inequality Index'
+            name='Global Mental Dis. vs Gender Inequality Index',
+            marker_symbol='diamond',
+            marker_size=8,
+            marker_color='#CC79A7',
+            line=dict(color='#CC79A7')
         ))
-        
+
         # Add vertical line for selected year
-        fig5.add_vline(x=selected_year, line_dash='dash', line_color='red', opacity=0.5)
+        fig5.add_vline(x=selected_year, line_dash='dash', line_color='red', opacity=0.6)
+
+        fig5.add_hline(
+            y=0,
+            line_dash='dash',
+            line_color='black',
+            opacity=0.3
+        )
         
         fig5.update_layout(
             title='Correlation Coefficients Over Time',
+            height=500,
             xaxis_title='Year',
             yaxis_title='Correlation Coefficient',
-            margin=dict(l=10, r=10, t=40, b=10),
-            yaxis=dict(range=[-1, 1])
+            margin=dict(l=10, r=10, t=120, b=10),
+            yaxis=dict(range=[-1, 1]),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+            legend=dict(
+                orientation='h',
+                yanchor='bottom',
+                y=1,
+                xanchor='center',
+                x=0.5
+            )
         )
 
         # Create correlation matrix
@@ -150,13 +185,13 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
             'schizo_disorders': 'Schizophrenia',
             'depression_disorders': 'Depression',
             'anxiety_disorders': 'Anxiety',
-            'bipolar_disorders': 'Bipolar Disorder',
-            'eating_disorders': 'Eating Disorders',
-            'unemployment_rate': 'Unemployment Rate (%)',
-            'hf_score': 'Human Freedom Index',
-            'alcohol_consumption': 'Alcohol Consumption (liters)',
-            'gii': 'Gender Inequality Index',
-            'global_mental_disorders': 'Global Mental Disorders'
+            'bipolar_disorders': 'Bipolar Dis.',
+            'eating_disorders': 'Eating Dis.',
+            'unemployment_rate': 'Unemploy. (%)',
+            'hf_score': 'Human Free.',
+            'alcohol_consumption': 'Alcohol Cons.',
+            'gii': 'Gender Ineq.',
+            'global_mental_disorders': 'Global Mental Dis.'
         }
 
         corr_matrix = df_corr.copy()
@@ -165,23 +200,42 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
 
         corr_matrix = corr_matrix.rename(index=pretty_names, columns=pretty_names)
 
+        diag_mask = np.eye(corr_matrix.shape[0], dtype=bool)
+        corr_matrix.values[diag_mask] = -999  # special code for diagonal
+
+        custom_scale = [
+            [0.00, 'white'],
+            [0.001, '#005fb8'],
+            [0.50, '#E0E0E0'],
+            [1.00, '#cc0000']
+        ]
+
+        text_matrix = corr_matrix.round(2).astype(str)
+        # Remove diagonal values
+        for i in range(len(text_matrix)):
+            text_matrix.iat[i, i] = ""
+
         fig_cm = px.imshow(
             corr_matrix,
-             text_auto=".2f",
             aspect='auto',
-            color_continuous_scale='RdBu_r',
+            color_continuous_scale=custom_scale,
             zmin=-1, zmax=1
         )
 
         fig_cm.update_traces(
+            text=text_matrix,
+            texttemplate="%{text}",
             hovertemplate='<b>%{x}</b> vs <b>%{y}</b><br>'+
                         'Correlation: <b>%{z:.3f}</b><extra></extra>'
         )
 
+        fig_cm.update_xaxes(showgrid=False)
+        fig_cm.update_yaxes(showgrid=False)
+
         fig_cm.update_layout(
             title=f'Correlation Matrix ({selected_year})',
-            xaxis_title='Variables',
-            yaxis_title='Variables'
+            xaxis_title='Indicators',
+            yaxis_title='Indicators'
         )
         
         return fig1, fig2, fig3, fig4, fig5, fig_cm
