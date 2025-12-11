@@ -231,62 +231,69 @@ app.layout = dbc.Container([
                         ], md=6)
                     ], className='mb-3'),
 
-                    html.Label('Factor(s):', className='fw-semibold'),
-                    html.P(
-                        """
-                        Select one or several mental health indicators to include in the comparison 
-                        (e.g. anxiety disorders, depressive disorders).
-                        """,
-                        className='text-muted small'
+                    html.Div(
+                        id="analysis-section",
+                        children=[
+                            html.Label('Factor(s):', className='fw-semibold'),
+                            html.P(
+                                """
+                                Select one or several mental health indicators to include in the comparison 
+                                (e.g. anxiety disorders, depressive disorders).
+                                """,
+                                className='text-muted small'
+                            ),
+                            dcc.Dropdown(
+                                id='indicators-multi',
+                                options=[{'label': illness_labels[col], 'value': col} for col in illness_cols],
+                                value=['anxiety_disorders'],
+                                multi=True,
+                                clearable=False
+                            ),
+
+                            html.Hr(),
+
+                            html.H5('Time series for selected country(ies)'),
+                            html.Div(id='graphs-container'),
+
+                            html.Hr(),
+
+                            html.H5('Radar chart for a specific year', className='mt-3'),
+                            dcc.Slider(
+                                id='radar-year-slider',
+                                min=correlation_min_year,
+                                max=correlation_max_year,
+                                value=correlation_max_year,
+                                marks={year: str(year) for year in range(correlation_min_year, correlation_max_year + 1, 5)},
+                                step=1,
+                                tooltip={'placement': 'bottom', 'always_visible': True},
+                                className='mb-4'
+                            ),
+
+                            html.Div(id='radar-graphs-container'),
+                        ],
+                        style={"display": "none"}
                     ),
-                    dcc.Dropdown(
-                        id='indicators-multi',
-                        options=[{'label': illness_labels[col], 'value': col} for col in illness_cols],
-                        value=['anxiety_disorders'],
-                        multi=True,
-                        clearable=False
-                    ),
 
-                    html.Hr(),
-
-                    html.H5('Time series for selected country(ies)'),
-                    html.Div(id='graphs-container'),
-
-                    html.Hr(),
-
-                    html.H5('Radar chart for a specific year', className='mt-3'),
-                    dcc.Slider(
-                        id='radar-year-slider',
-                        min=correlation_min_year,
-                        max=correlation_max_year,
-                        value=correlation_max_year,
-                        marks={year: str(year) for year in range(correlation_min_year, correlation_max_year + 1, 5)},
-                        step=1,
-                        tooltip={'placement': 'bottom', 'always_visible': True},
-                        className='mb-4'
-                    ),
-
-                    html.Div(id='radar-graphs-container'),
                     html.Div([
-                    html.H6("Additional indicators explained:", className="mt-3 mb-2"),
-                    html.Ul([
-                        html.Li([
-                            html.B("Freedom Index: "),
-                            "Composite index evaluating political rights, civil liberties, and overall democratic freedom. "
-                            "Higher values represent countries where individuals enjoy more personal and societal freedoms."
-                        ]),
-                        html.Li([
-                            html.B("Alcohol Consumption: "),
-                            "Average annual liters of pure alcohol consumed per adult (15+). "
-                            "This is a health and behavioral indicator often correlated with social patterns and well-being."
-                        ]),
-                        html.Li([
-                            html.B("Gender Inequality Index: "),
-                            "Measures inequality in reproductive health, empowerment, and labor market participation. "
-                            "Higher values indicate greater inequality between men and women."
-                        ]),
-                    ], style={"fontSize": "14px"})
-                ], className="mb-4")
+                        html.H6("Additional indicators explained:", className="mt-3 mb-2"),
+                        html.Ul([
+                            html.Li([
+                                html.B("Freedom Index: "),
+                                "Composite index evaluating political rights, civil liberties, and overall democratic freedom. "
+                                "Higher values represent countries where individuals enjoy more personal and societal freedoms."
+                            ]),
+                            html.Li([
+                                html.B("Alcohol Consumption: "),
+                                "Average annual liters of pure alcohol consumed per adult (15+). "
+                                "This is a health and behavioral indicator often correlated with social patterns and well-being."
+                            ]),
+                            html.Li([
+                                html.B("Gender Inequality Index: "),
+                                "Measures inequality in reproductive health, empowerment, and labor market participation. "
+                                "Higher values indicate greater inequality between men and women."
+                            ]),
+                        ], style={"fontSize": "14px"})
+                    ], className="mb-4")
 
                     
                 ])

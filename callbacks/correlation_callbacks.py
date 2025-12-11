@@ -4,6 +4,39 @@ import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 
+def make_scatter(df, x, y, title, labels):
+    fig = px.scatter(
+        df,
+        x=x,
+        y=y,
+        hover_name='country',
+        trendline='ols',
+        labels=labels,
+        title=title
+    )
+
+    fig.update_traces(
+        marker=dict(
+            size=8,
+            opacity=0.6,
+            line=dict(width=0)
+        )
+    )
+
+    fig.update_layout(
+        margin=dict(l=10, r=10, t=40, b=10),
+        plot_bgcolor="white",
+        xaxis=dict(showgrid=True, gridcolor="lightgrey", griddash="dash", zeroline=False),
+        yaxis=dict(showgrid=True, gridcolor="lightgrey", griddash="dash", zeroline=False),
+        title={
+            "text": fig.layout.title.text,
+            "font": {"size": 14, "color": "black"}
+        }
+    )
+
+    return fig
+
+
 def register_correlation_callbacks(app, df, correlation_min_year, correlation_max_year):
     @app.callback(
         [Output('corr-graph-1', 'figure'),
@@ -28,64 +61,52 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
         df_corr = df_corr.dropna(subset=['global_mental_disorders', 'unemployment_rate', 'hf_score'])
         
         # Graph 1: Mental Disorders vs Unemployment
-        fig1 = px.scatter(
+        fig1 = make_scatter(
             df_corr,
-            y='unemployment_rate',
-            x='global_mental_disorders',
-            hover_name='country',
-            trendline='ols',
+            x="global_mental_disorders",
+            y="unemployment_rate",
+            title=f"Global Mental Dis. vs Unemployment ({selected_year})",
             labels={
-                'unemployment_rate': 'Unemployment Rate (%)',
-                'global_mental_disorders': 'Global Mental Disorders'
-            },
-            title=f'Global Mental Disorders vs Unemployment rate ({selected_year})'
+                "unemployment_rate": "Unemployment Rate (%)",
+                "global_mental_disorders": "Global Mental Disorders"
+            }
         )
-        fig1.update_layout(margin=dict(l=10, r=10, t=40, b=10))
         
         # Graph 2: Mental Disorders vs Freedom Index
-        fig2 = px.scatter(
+        fig2 = make_scatter(
             df_corr,
-            y='hf_score',
-            x='global_mental_disorders',
-            hover_name='country',
-            trendline='ols',
+            x="global_mental_disorders",
+            y="hf_score",
+            title=f"Global Mental Dis. vs Freedom ({selected_year})",
             labels={
-                'hf_score': 'Human Freedom Index',
-                'global_mental_disorders': 'Global Mental Disorders'
-            },
-            title=f'Global Mental Disorders vs Freedom ({selected_year})'
+                "hf_score": "Human Freedom Index",
+                "global_mental_disorders": "Global Mental Disorders"
+            }
         )
-        fig2.update_layout(margin=dict(l=10, r=10, t=40, b=10))
         
         # Graph 3: Mental Disorders vs Alcohol Consumption
-        fig3 = px.scatter(
+        fig3 = make_scatter(
             df_corr,
-            y='alcohol_consumption',
-            x='global_mental_disorders',
-            hover_name='country',
-            trendline='ols',
+            x="global_mental_disorders",
+            y="alcohol_consumption",
+            title=f"Global Mental Dis. vs Alcohol cons. ({selected_year})",
             labels={
-                'alcohol_consumption': 'Alcohol consumption (liters)',
-                'global_mental_disorders': 'Global Mental Disorders'
-            },
-            title=f'Global Mental Disorders vs Alcohol consumption ({selected_year})'
+                "alcohol_consumption": "Alcohol consumption (liters)",
+                "global_mental_disorders": "Global Mental Disorders"
+            }
         )
-        fig3.update_layout(margin=dict(l=10, r=10, t=40, b=10))
 
         # Graph 4: Mental Disorders vs Gender Inequality Index
-        fig4 = px.scatter(
+        fig4 = make_scatter(
             df_corr,
-            y='gii',
-            x='global_mental_disorders',
-            hover_name='country',
-            trendline='ols',
+            x="global_mental_disorders",
+            y="gii",
+            title=f"Global Mental Dis. vs Gender Inequality ({selected_year})",
             labels={
-                'gii': 'Gender Inequality Index [0,1]',
-                'global_mental_disorders': 'Global Mental Disorders'
-            },
-            title=f'Global Mental Disorders vs Gender Inequality Index ({selected_year})'
+                "gii": "Gender Inequality Index [0,1]",
+                "global_mental_disorders": "Global Mental Disorders"
+            }
         )
-        fig4.update_layout(margin=dict(l=10, r=10, t=40, b=10))
         
         # Graph 5: Show correlation coefficients over time
         # Calculate correlations for each year in the range

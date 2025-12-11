@@ -6,6 +6,17 @@ import plotly.graph_objects as go
 from utils.helpers import code_to_name
 
 def register_comparison_callbacks(app, df, illness_labels):
+
+    @app.callback(
+        Output("analysis-section", "style"),
+        Input("select-country-dropdown", "value")
+    )
+    def show_analysis_section(selected_country):
+        if not selected_country:
+            return {"display": "none"}
+        return {"display": "block"}
+
+
     @app.callback(
         Output("compare-country-dropdown", "options"),
         Output("compare-country-dropdown", "disabled"),
@@ -99,7 +110,18 @@ def register_comparison_callbacks(app, df, illness_labels):
                 trace.marker.symbol = symbols[i % len(symbols)]
 
             fig.update_yaxes(autorange=False, range=[0, ymax * 1.05])
-            fig.update_layout(margin=dict(l=10, r=10, t=40, b=10))
+            fig.update_layout(
+                plot_bgcolor="white",
+                xaxis=dict(
+                    showgrid=True,
+                    gridcolor="lightgrey"
+                ),
+                yaxis=dict(
+                    showgrid=True,
+                    gridcolor="lightgrey"
+                ),
+                margin=dict(l=40, r=20, t=60, b=40)
+            )
             return dcc.Graph(figure=fig, style={'height': '320px'}, config={'displayModeBar': False})
 
         # Loop on selected indactors and create graph
@@ -185,7 +207,22 @@ def register_comparison_callbacks(app, df, illness_labels):
 
         fig.update_layout(
             polar=dict(
-                radialaxis=dict(visible=True, range=[0, 1])
+                bgcolor="white",
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 1],
+                    showticklabels=True, 
+                    showline=True,
+                    linecolor="lightgrey",
+                    linewidth=0.5,
+                    gridcolor="lightgrey",
+                    gridwidth=0.4
+                ),
+                angularaxis=dict(
+                    linewidth=0.4,
+                    linecolor="lightgrey",
+                    tickfont=dict(size=12)
+                )
             ),
             title=f'Country Comparison Radar - {selected_year}',
             showlegend=True
