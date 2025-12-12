@@ -30,7 +30,7 @@ def register_intro_callbacks(app, df, illness_labels):
         )
         
         fig_map.update_traces(
-            hovertemplate='<b>%{hovertext}</b><br>' + unit_of_measurement + ': %{z:.2f}%<extra></extra>'
+            hovertemplate='<b>%{hovertext}</b><br>' + unit_of_measurement + ': %{z:.2f}<extra></extra>'
         )
         
         fig_map.update_layout(
