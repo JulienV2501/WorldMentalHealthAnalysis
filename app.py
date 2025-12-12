@@ -262,10 +262,6 @@ app.layout = dbc.Container([
                             "This radar chart compares the global mental health indicator with the external"
                              " socio-economic indicators. Its purpose is to highlight the overall profile of"
                               " countries across multiple dimensions. Values are normalized and do not represent absolute values. ",
-                            html.Li([
-                                html.B("Freedom Index: "),
-                                "High values means high human freedom."
-                            ]),
                             ]),
                             dcc.Slider(
                                 id='radar-year-slider',
@@ -335,6 +331,18 @@ app.layout = dbc.Container([
                         """,
                         className='text-muted'
                     ),
+                    html.Div([
+                    html.Ul([
+                        html.H6("Explanation about the next graphs:", className="mt-3 mb-2"),
+                        html.P(
+                        """
+                        The 4 next graphs show the relations between 2 factors for each countries. A regression function as been calculated to
+                        show the trend between the 2 factors.
+                        """,
+                        className='text-muted'
+                    ),
+                    ], style={"fontSize": "14px"})
+                ], className="mb-4"),
 
                     html.Label('Year:', className='fw-bold mb-2 mt-2'),
                     dcc.Slider(
@@ -365,6 +373,31 @@ app.layout = dbc.Container([
                             dcc.Graph(id='corr-graph-4', config={'displayModeBar': False})
                         ], md=6)
                     ]),
+                    html.Div([
+                    html.Ul([
+                        html.H6("Explanation about the next graphs (Correlation):", className="mt-3 mb-2"),
+                        html.P(
+                        """
+                        For the 2 next graph the correlation between each factors have been calculated. The values are between +1 and -1 :
+                        """,
+                        className='text-muted'
+                    ),
+                    html.Li([
+                                html.B("-1 : "),
+                                "Values nearing -1 show high inversed correlation."
+                            ]),
+                    html.Li([
+                                html.B("0 : "),
+                                "Values nearing 0 show no correlation."
+                            ]),
+                    html.Li([
+                                html.B("1 : "),
+                                "Values nearing 0 high inversed correlation."
+                            ]),
+
+
+                    ], style={"fontSize": "14px"})
+                ], className="mb-4"),
                     dbc.Row([
                         dbc.Col([
                             dcc.Graph(id='corr-graph-5', config={'displayModeBar': False})
