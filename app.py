@@ -94,7 +94,7 @@ app.layout = dbc.Container([
                     dcc.Dropdown(
                         id='illness-dropdown',
                         options=[{'label': illness_labels[col], 'value': col} for col in illness_cols],
-                        value=illness_cols[0],
+                        value=illness_cols[-1],
                         clearable=False
                     ),
 
@@ -245,7 +245,7 @@ app.layout = dbc.Container([
                             dcc.Dropdown(
                                 id='indicators-multi',
                                 options=[{'label': illness_labels[col], 'value': col} for col in illness_cols],
-                                value=['anxiety_disorders'],
+                                value=['global_mental_disorders'],
                                 multi=True,
                                 clearable=False
                             ),
