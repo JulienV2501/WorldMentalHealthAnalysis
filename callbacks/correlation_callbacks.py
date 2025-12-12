@@ -208,7 +208,7 @@ def register_correlation_callbacks(app, df, correlation_min_year, correlation_ma
             'anxiety_disorders': 'Anxiety',
             'bipolar_disorders': 'Bipolar Dis.',
             'eating_disorders': 'Eating Dis.',
-            'unemployment_rate': 'Unemploy. (%)',
+            'unemployment_rate': 'Unemploy. rate',
             'hf_score': 'Human Free.',
             'alcohol_consumption': 'Alcohol Cons.',
             'gii': 'Gender Ineq.',

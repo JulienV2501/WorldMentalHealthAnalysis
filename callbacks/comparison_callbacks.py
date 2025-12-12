@@ -151,11 +151,11 @@ def register_comparison_callbacks(app, df, illness_labels):
         c1 = c1_row.iloc[0]
 
         pretty_names = {
-            'unemployment_rate': 'Unemployment (%)',
+            'unemployment_rate': 'Unemployment rate',
             'gii': 'Gender Inequality Index',
             'hf_score': 'Human Freedom Index',
             'alcohol_consumption': 'Alcohol Consumption',
-            # 'global_mental_disorders': 'Mental Disorders (Global)'
+            'global_mental_disorders': 'Global Mental Disorders'
         }
 
         indicators = list(pretty_names.keys())

@@ -66,6 +66,11 @@ app.layout = dbc.Container([
                             "Measures inequality in reproductive health, empowerment, and labor market participation. "
                             "Higher values indicate greater inequality between men and women."
                         ]),
+                        html.Li([
+                            html.B("Unemployment Rate: "),
+                            "Represents the percentage of habitant that is unemployed but actively seeking employment. "
+                            "Higher values indicate a greater share of the population without work."
+                        ]),
                     ], style={"fontSize": "14px"})
                 ], className="mb-4")
             ])
@@ -384,7 +389,7 @@ app.layout = dbc.Container([
                     ),
                     html.Li([
                                 html.B("-1 : "),
-                                "Values nearing -1 show high inversed correlation."
+                                "Values nearing -1 show strong inversed correlation."
                             ]),
                     html.Li([
                                 html.B("0 : "),
@@ -392,7 +397,7 @@ app.layout = dbc.Container([
                             ]),
                     html.Li([
                                 html.B("1 : "),
-                                "Values nearing 0 high correlation."
+                                "Values nearing 1 show strong correlation."
                             ]),
 
 
