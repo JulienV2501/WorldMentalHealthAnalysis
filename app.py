@@ -34,8 +34,8 @@ app.layout = dbc.Container([
                 """
                 This dashboard explores the global evolution of mental health disorders across countries. 
                 It allows users to visualize disorder prevalence over time,
-                compare nations, and identify correlations with socioeconomic indicators such as unemployment, human freedom and alcool consumption.
-                 The goal is to provide an intuitive and data-driven view of a link between different indicators and mental health.
+                compare countries, and identify correlations with socio-economic indicators such as unemployment, human freedom and alcool consumption.
+                The goal is to provide an intuitive exploration of relationships and patterns between different socio-economic indicators and mental health.
                 """,
                 className='text-center mb-4 fs-5',
                 style={'maxWidth': '900px', 'margin': 'auto'}
@@ -68,8 +68,13 @@ app.layout = dbc.Container([
                         ]),
                         html.Li([
                             html.B("Unemployment Rate: "),
-                            "Represents the percentage of habitant that is unemployed but actively seeking employment. "
+                            "Represents the percentage of the population that is unemployed but actively seeking employment. "
                             "Higher values indicate a greater share of the population without work."
+                        ]),
+                        html.Li([
+                            html.B("Global Mental Disorders: "),
+                            "The Global Mental Disorders indicator is a composite index that combines the prevalence of several mental health disorders into a single normalized score."
+                            "It does not represent a real percentage of the population."
                         ]),
                     ], style={"fontSize": "14px"})
                 ], className="mb-4")
@@ -88,8 +93,8 @@ app.layout = dbc.Container([
                     html.P(
                         """
                         This section provides a global overview of mental health disorders. 
-                        Use the controls below to select a specific disorder and year, then explore 
-                        how its prevalence varies across the world, continents, and income groups,
+                        Select a disorder and a year to explore 
+                        how prevalence varies across countries, continents, and income groups,
                         as well as its global evolution over time.
                         """,
                         className='text-muted'
@@ -120,8 +125,7 @@ app.layout = dbc.Container([
                     html.P(
                         """
                         The map shows the estimated prevalence of the selected mental health disorder 
-                        in each country for the chosen year. Darker colors generally indicate higher 
-                        prevalence values.
+                        in each country for the chosen year. Colors represent prevalence levels from low (dark) to high (light).
                         """,
                         className='text-muted small'
                     ),
@@ -186,9 +190,8 @@ app.layout = dbc.Container([
 
                     html.P(
                         """
-                        This section focus on specific countries and compare their mental health 
-                        trends over time. You can analyse one country in detail or compare it with another 
-                        country on multiple mental health indicators.
+                        This section focus on how mental health indicators evolve over time and differ across countries.
+                        It allows both detailed analysis of a single country and direct comparisons between two countries.
                         """,
                         className='text-muted'
                     ),
@@ -280,38 +283,38 @@ app.layout = dbc.Container([
                             ),
 
                             html.Div(id='radar-graphs-container'),
+
+                            html.Div([
+                                html.H6("Additional explanations :", className="mt-3 mb-2"),
+                                html.Ul([
+                                    "For this graph, all indicators are normalized on a scale from 0 to 1."
+                                    "Higher values indicate a higher level of the measured concept, but the interpretation differs by indicator:",
+                                    html.Li([
+                                        html.B("Freedom Index: "),
+                                        "higher values indicate greater human freedom."
+                                    ]),
+                                    html.Li([
+                                        html.B("Alcool Consumption: "),
+                                        "higher values indicate higher alcohol consumption per person."
+                                    ]),
+                                    html.Li([
+                                        html.B("Gender Inequality: "),
+                                        "higher values indicate greater inequality between genders."
+                                    ]),
+                                    html.Li([
+                                        html.B("Unemployment: "),
+                                        "higher values indicate higher unemployment."
+                                    ]),
+                                    html.Li([
+                                        html.B("Mental Disorder: "),
+                                        "higher values indicate a greater overall mental health burden."
+                                    ]),
+
+                            ], style={"fontSize": "14px"})
+                    ], className="mb-4")
                         ],
                         style={"display": "none"}
                     ),
-
-                    html.Div([
-                        html.H6("Additional explanations :", className="mt-3 mb-2"),
-                        html.Ul([
-                            "For this graph, the values are normalize between 0 and 1. "
-                            "The values have different meaning for each indicators:",
-                            html.Li([
-                                html.B("Freedom Index: "),
-                                "High values means high human freedom."
-                            ]),
-                            html.Li([
-                                html.B("Alcool Consumption: "),
-                                "High Values means hign consumption of alcool per person."
-                            ]),
-                            html.Li([
-                                html.B("Gender Inequality: "),
-                                "High Values means high inequality between the genders."
-                            ]),
-                            html.Li([
-                                html.B("Unemployment: "),
-                                "High Values means high rate of unemployment."
-                            ]),
-                            html.Li([
-                                html.B("Mental Disorder: "),
-                                "High Values means greater global mental disorders cases."
-                            ]),
-
-                        ], style={"fontSize": "14px"})
-                    ], className="mb-4")
 
                     
                 ])
@@ -330,9 +333,8 @@ app.layout = dbc.Container([
 
                     html.P(
                         """
-                        This section explores how mental health indicators relate to unemployment,
-                        freedom and other socioeconomic variables. Use the year slider to update
-                        all correlation plots and the correlation matrix.
+                        This section explores relationships between mental health indicators and socio-economic variables. 
+                        Use the year slider to update all correlation plots and the correlation matrix.
                         """,
                         className='text-muted'
                     ),
@@ -341,8 +343,8 @@ app.layout = dbc.Container([
                         html.H6("Explanation about the next graphs:", className="mt-3 mb-2"),
                         html.P(
                         """
-                        The 4 next graphs show the relations between 2 factors for each countries. A regression function as been calculated to
-                        show the trend between the 2 factors.
+                        The following scatter plots show the relations between 2 factors for each countries.
+                        A simple regression line is displayed to highlight overall trends.
                         """,
                         className='text-muted'
                     ),
@@ -380,24 +382,24 @@ app.layout = dbc.Container([
                     ]),
                     html.Div([
                     html.Ul([
-                        html.H6("Explanation about the next graphs (Correlation):", className="mt-3 mb-2"),
+                        html.H6("Explanation about the next correlation graphs:", className="mt-3 mb-2"),
                         html.P(
                         """
-                        For the 2 next graph the correlation between each factors have been calculated. The values are between +1 and -1 :
+                        The next two graphs display correlation values between pairs of variables across countries. Coefficients range from -1 to +1:
                         """,
                         className='text-muted'
                     ),
                     html.Li([
                                 html.B("-1 : "),
-                                "Values nearing -1 show strong inversed correlation."
+                                "Values nearing -1 indicate a strong inversed correlation."
                             ]),
                     html.Li([
                                 html.B("0 : "),
-                                "Values nearing 0 show no correlation."
+                                "Values nearing 0 indicate poor correlation."
                             ]),
                     html.Li([
                                 html.B("1 : "),
-                                "Values nearing 1 show strong correlation."
+                                "Values nearing 1 indicate a strong correlation."
                             ]),
 
 

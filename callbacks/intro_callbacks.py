@@ -142,7 +142,7 @@ def register_intro_callbacks(app, df, illness_labels):
         ))
 
         fig.update_layout(
-            title=f'{illness_labels[selected_illness]} - Overall trend and representation of the most/least affected countries',
+            title=f'{illness_labels[selected_illness]} - Representation of the most/least affected countries',
 
             yaxis=dict(
                 title=unit_of_measurement,
