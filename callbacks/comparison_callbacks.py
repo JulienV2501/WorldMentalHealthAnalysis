@@ -155,7 +155,7 @@ def register_comparison_callbacks(app, df, illness_labels):
             'gii': 'Gender Inequality Index',
             'hf_score': 'Human Freedom Index',
             'alcohol_consumption': 'Alcohol Consumption',
-            'global_mental_disorders': 'Mental Disorders (Global)'
+            # 'global_mental_disorders': 'Mental Disorders (Global)'
         }
 
         indicators = list(pretty_names.keys())
