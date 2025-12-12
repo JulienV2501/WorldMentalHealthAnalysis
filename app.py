@@ -258,6 +258,15 @@ app.layout = dbc.Container([
                             html.Hr(),
 
                             html.H5('Radar chart for a specific year', className='mt-3'),
+                            html.Ul([
+                            "This radar chart compares the global mental health indicator with the external"
+                             " socio-economic indicators. Its purpose is to highlight the overall profile of"
+                              " countries across multiple dimensions. Values are normalized and do not represent absolute values. ",
+                            html.Li([
+                                html.B("Freedom Index: "),
+                                "High values means high human freedom."
+                            ]),
+                            ]),
                             dcc.Slider(
                                 id='radar-year-slider',
                                 min=correlation_min_year,
@@ -275,23 +284,31 @@ app.layout = dbc.Container([
                     ),
 
                     html.Div([
-                        html.H6("Additional indicators explained:", className="mt-3 mb-2"),
+                        html.H6("Additional explanations :", className="mt-3 mb-2"),
                         html.Ul([
+                            "For this graph, the values are normalize between 0 and 1. "
+                            "The values have different meaning for each indicators:",
                             html.Li([
                                 html.B("Freedom Index: "),
-                                "Composite index evaluating political rights, civil liberties, and overall democratic freedom. "
-                                "Higher values represent countries where individuals enjoy more personal and societal freedoms."
+                                "High values means high human freedom."
                             ]),
                             html.Li([
-                                html.B("Alcohol Consumption: "),
-                                "Average annual liters of pure alcohol consumed per adult (15+). "
-                                "This is a health and behavioral indicator often correlated with social patterns and well-being."
+                                html.B("Alcool Consumption: "),
+                                "High Values means hign consumption of alcool per person."
                             ]),
                             html.Li([
-                                html.B("Gender Inequality Index: "),
-                                "Measures inequality in reproductive health, empowerment, and labor market participation. "
-                                "Higher values indicate greater inequality between men and women."
+                                html.B("Gender Inequality: "),
+                                "High Values means high inequality between the genders."
                             ]),
+                            html.Li([
+                                html.B("Unemployment: "),
+                                "High Values means high rate of unemployment."
+                            ]),
+                            html.Li([
+                                html.B("Mental Disorder: "),
+                                "High Values means greater global mental disorders cases."
+                            ]),
+
                         ], style={"fontSize": "14px"})
                     ], className="mb-4")
 
