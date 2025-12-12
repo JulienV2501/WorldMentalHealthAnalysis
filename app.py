@@ -392,7 +392,7 @@ app.layout = dbc.Container([
                             ]),
                     html.Li([
                                 html.B("1 : "),
-                                "Values nearing 0 high inversed correlation."
+                                "Values nearing 0 high correlation."
                             ]),
 
 
