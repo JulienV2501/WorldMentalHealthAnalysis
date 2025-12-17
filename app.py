@@ -73,7 +73,7 @@ app.layout = dbc.Container([
                         ]),
                         html.Li([
                             html.B("Global Mental Disorders: "),
-                            "The Global Mental Disorders indicator is a composite index that combines the prevalence of several mental health disorders into a single normalized score."
+                            "The Global Mental Disorders indicator is a composite index that combines the prevalence of several mental health disorders into a single normalized score. "
                             "It does not represent a real percentage of the population."
                         ]),
                     ], style={"fontSize": "14px"})

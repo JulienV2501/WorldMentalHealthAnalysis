@@ -152,7 +152,7 @@ def register_intro_callbacks(app, df, illness_labels):
             xaxis=dict(
                 domain=[0, 1],
                 anchor='y',
-                title='Countries (averages)',
+                title='Countries',
                 tickangle=30
             ),
 
